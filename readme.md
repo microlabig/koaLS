@@ -1,4 +1,4 @@
-# ДЗ 5 (Express.js + Mongoose + socket.io + Docker)
+# ДЗ 5 (KOA.js + PostgreSQL + socket.io + Docker)
 Дата прохождения курса 10.03.2020 - 17.04.2020
 
 Итоговый проект находится на heroku [https://microlabig.herokuapp.com](https://microlabig.herokuapp.com "https://microlabig.herokuapp.com")
@@ -10,10 +10,9 @@
 ## Необходимые действия для запуска проекта
 
 1. установить node.js - [nodejs.org](https://nodejs.org/ "Node.JS")
-2. установить mongodb - [MongoDBCompassCommunity](https://www.mongodb.com/download-center/compass "MongoDB Compass")
-3. cклонировать проект к себе и перейти в каталог проекта
-4. `npm i` или `yarn install` - установить зависимости
-5. создать в корне проекта файл `.env`, настроить следующим образом:  
+2. cклонировать проект к себе и перейти в каталог проекта
+3. `npm i` или `yarn install` - установить зависимости
+4. создать в корне проекта файл `.env`, настроить следующим образом:  
    
    ```dotnetcli
     PORT=3000               # порт приложения
@@ -29,8 +28,7 @@
     REMOTE_DB_USER='user'   # логин доступа к удаленной БД
     REMOTE_DB_PASS='pass'   # пароль к удаленной БД
    ```
-
-6. запуск проекта командой `node app`
+5. запуск проекта командой `node app`
 
 ---
 ## ТЗ:
