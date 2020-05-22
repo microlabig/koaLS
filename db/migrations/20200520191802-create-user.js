@@ -9,12 +9,14 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       firstName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       image: {
         type: Sequelize.STRING
       },
       middleName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       permission: {
@@ -42,12 +44,16 @@ module.exports = {
         }
       },
       surName: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       username: {
+        unique: true,
+        allowNull: false,
         type: Sequelize.STRING
       },
       password: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       createdAt: {

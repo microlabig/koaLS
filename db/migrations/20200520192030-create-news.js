@@ -9,9 +9,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       text: {
+        allowNull: false,
         type: Sequelize.TEXT
       },
       title: {
+        allowNull: false,
         type: Sequelize.STRING
       },
       user: {

@@ -15,10 +15,10 @@ const sequelize = new Sequelize(
 fs
   .readdirSync(path.join(__dirname, modelsFolderPath))
   .forEach((file) => {
-    const model = sequelize['import'](
+    const model = sequelize.import(
       path.join(__dirname, modelsFolderPath, file)
     );
-    models[model.name] = models;
+    models[model.name] = model;
 });
 
 Object.keys(models).forEach((modelName) => {

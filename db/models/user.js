@@ -2,29 +2,34 @@
 const bcrypt = require('bcryptjs');
 
 module.exports = (sequelize, DataTypes) => {
-  const user = sequelize.define('user', {
-    firstName: DataTypes.STRING,
-    image: DataTypes.STRING,
-    middleName: DataTypes.STRING,
-    permission: DataTypes.JSONB,
-    surName: DataTypes.STRING,
-    username: DataTypes.STRING,
-    password: {
-      type: DataTypes.STRING,
-      set: function(v) {
-        // var salt = bcrypt.genSaltSync(5);
-        // var password = bcrypt.hashSync(v, salt);
-        const that = this;
-        bcrypt.hash(this.password, 10, (err, hash) => {
-          if (err) {
-            throw new Error('Ошибка сохранения пароля!');
-          }
-          return that.setDataValue('password', hash);
-        });
-      }
+  const user = sequelize.define(
+    'user',
+    {
+      firstName: DataTypes.STRING,
+      image: DataTypes.STRING,
+      middleName: DataTypes.STRING,
+      permission: DataTypes.JSONB,
+      surName: DataTypes.STRING,
+      username: DataTypes.STRING,
+      password: DataTypes.STRING
     },
-  }, {});
-  user.associate = function(models) {
+    {
+      hooks: {
+        // закодируем пароль перед сохранением пользователя
+        beforeCreate: async (user) => {
+          const password = user.password;
+          user.password = await bcrypt.hash(password, 10);
+        }
+      },
+      instanceMethods: {
+        // проверка пароля
+        validPassword: async function (password) {
+          return await bcrypt.compare(password, this.password);
+        }
+      }
+    }
+  );
+  user.associate = function (models) {
     // associations can be defined here
   };
   return user;

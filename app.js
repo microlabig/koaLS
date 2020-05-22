@@ -5,12 +5,13 @@ const Koa = require('koa');
 const app = new Koa();
 const serve = require('koa-static');
 const koaBody = require('koa-body');
-const cors = require('cors');
+const cors = require('@koa/cors');
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const session = require('koa-session');
 const socketRun = require(path.join(__dirname, 'chat'));
 const db = require(path.join(__dirname, 'db'));
+
 const secretKey = process.env.secretKey || 'secret key session';
 const CONFIG_COOKIE = {
   key: secretKey,
@@ -30,10 +31,6 @@ app.use(session(CONFIG_COOKIE, app));
 // статика
 app.use(serve('./public'));
 
-// роутер
-app.use(cors());
-app.use(require('./routes').routes());
-
 // обработчик ошибок
 app.use(async (ctx, next) => {
   try {
@@ -42,10 +39,15 @@ app.use(async (ctx, next) => {
       ctx.throw(ctx.status);
     }
   } catch (err) {
-    ctx.status = err.status;
-    console.log(err);
+    console.error(err);
+    ctx.response.status = ctx.status;
+    ctx.body = err.message;
   }
 });
+
+// роутер
+app.use(cors());
+app.use(require('./routes').routes());
 
 // подключение к БД (postgres)
 db.authenticate()

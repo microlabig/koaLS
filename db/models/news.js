@@ -5,14 +5,14 @@ module.exports = (sequelize, DataTypes) => {
     {
       text: DataTypes.TEXT,
       title: DataTypes.STRING,
-      user: DataTypes.INTEGER
+      user_id: DataTypes.INTEGER
     },
     {}
   );
   news.associate = function (models) {
     // associations can be defined here
-    news.belongTo(models.user, {
-      foreignKey: 'user'
+    news.belongsTo(models.user, {
+      foreignKey: 'user_id'
     });
   };
   return news;
