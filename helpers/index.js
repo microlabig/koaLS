@@ -13,11 +13,14 @@ module.exports.validateData = (obj) => {
   return true;
 };
 
-module.exports.sendStatus = (ctx, { status, goodCode, failCode }) => {
-  if (status) {
-    ctx.response.status = goodCode;
+module.exports.sendResponse = (ctx, status) => {
+  const { code, message, payload } = status;
+  ctx.status = code;
+  if (code >= 400) {
+    ctx.throw(code, message, payload);
   } else {
-    ctx.response.status = failCode;
+    console.log(`\nOk! ${code}: ${message}\n`);
+    ctx.response.status = code;
+    ctx.body = payload;
   }
-  ctx.body = status;
 };

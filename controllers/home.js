@@ -1,4 +1,4 @@
-const { sendStatus } = require('../helpers');
+const { sendResponse } = require('../helpers');
 const { UserAPI } = require('../api');
 
 // ------------
@@ -48,35 +48,26 @@ module.exports.post = async (ctx, next) => {
   let checkedUser = null;
   let status = null;
 
-  //   try {
   switch (url) {
     // регистрация нового пользователя
     case '/api/registration':
       status = await UserAPI.registerUser(body);
-      // userData = await UsersAPI.packUserData(body);
-      // if (userData) {
-      //   const newUser = new UserDB.User({ ...userData });
-      //   const saveStatus = await UsersAPI.saveUserData(newUser);
-      //   if (saveStatus) {
-      //     const obj = await UsersAPI.checkUserData(body);
-      //     res.status(201).json(UsersAPI.genToken(obj)); // "создано"
-      //   } else {
-      //     res.status(401).json({ message: 'Пользователь уже существует' }); // "нет содержимого"
-      //   }
-      // } else {
-      //   res.status(401).json({ message: 'Введите все поля' });
-      // }
+      break;
+
+    // логин пользователя
+    case '/api/login':
+      status = await UserAPI.loginUser(body);
+      if (status.code < 400) {
+        ctx.session.isAuth = true;
+        ctx.session.uid = status.payload.id;
+      }
       break;
 
     default:
       ctx.response.redirect('/');
       break;
   }
-  sendStatus(ctx, { status, goodCode: 201, failCode: 401 });
-
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
+  sendResponse(ctx, status);
 
   //   const url = req.url;
   //   const body = req.body;

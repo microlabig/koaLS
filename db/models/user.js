@@ -23,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       instanceMethods: {
         // проверка пароля
-        validPassword: async function (password) {
+        validatePassword: async function (password) {
+          console.log(1234566646356);
+
           return await bcrypt.compare(password, this.password);
         }
       }
@@ -32,5 +34,6 @@ module.exports = (sequelize, DataTypes) => {
   user.associate = function (models) {
     // associations can be defined here
   };
+
   return user;
 };

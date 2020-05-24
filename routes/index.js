@@ -7,7 +7,7 @@ const ctrlHome = require(path.join(__dirname, '..', 'controllers', 'home'));
 const isAuth = async (ctx, next) => {
   // если в сессии текущего пользователя есть пометка о том, что он является авторизованным
   // иначе перебросить пользователя на главную страницу сайта
-  return ctx.session.isAuth ? next() : ctx.status(401).redirect('/login');
+  return ctx.session.isAuth ? next() : ctx.redirect('/login');
 };
 
 // MW для лога url

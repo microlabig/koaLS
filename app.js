@@ -41,7 +41,7 @@ app.use(async (ctx, next) => {
   } catch (err) {
     console.error(err);
     ctx.response.status = ctx.status;
-    ctx.body = err.message;
+    ctx.body = { message: err.message };
   }
 });
 
@@ -63,3 +63,12 @@ app.listen(PORT, () => {
 
 // чат на socket.io
 socketRun(io);
+
+// в случае неопредеенной ошибки
+process.on('uncaughtException', (err) => {
+  console.error(
+    `${new Date().toUTCString()} uncaught exception: ${err.message}`
+  );
+  console.error(err.stack);
+  process.exit(1);
+});
