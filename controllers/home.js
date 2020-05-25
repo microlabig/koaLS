@@ -5,36 +5,38 @@ const { UserAPI } = require('../api');
 //     GET
 // ------------
 module.exports.get = async (ctx, next) => {
-  //   const { url } = await ctx.request;
-  //   const { headers } = await ctx.response;
-  //   let status = null;
-  //   try {
-  //     switch (url) {
-  //       // получение профиля по JWT в authorization headers запроса
-  //       case '/api/profile':
-  //         if (headers.authorization) {
-  //           // JWT-инфо
-  //           // status = await UsersAPI.getUserByJWT(req.headers.authorization);
-  //         }
-  //         break;
-  //       // получений новостей
-  //       case '/api/news':
-  //         //   status = await NewsAPI.getNews();
-  //         break;
-  //       // получение списка всех пользователей
-  //       case '/api/users':
-  //         //   status = await UsersAPI.getUsers();
-  //         break;
-  //       default:
-  //         ctx.response.redirect('/');
-  //         break;
-  //     }
-  //     if (status) {
-  //       ctx.response.status(200).json(status);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
+  const { url } = ctx.request;
+  const {
+    headers: { authorization: jwtData } // JWT-инфо
+  } = ctx.req;
+  let status = null;
+
+  switch (url) {
+    // получение профиля по JWT в authorization headers запроса
+    case '/api/profile':
+      if (jwtData) {
+        status = await UserAPI.getUserByToken(jwtData);
+      } else {
+        status = {
+          code: 500,
+          message: 'Something is go wrong...',
+          payload: null
+        };
+      }
+      break;
+    // получений новостей
+    case '/api/news':
+      //   status = await NewsAPI.getNews();
+      break;
+    // получение списка всех пользователей
+    case '/api/users':
+      status = await UserAPI.getAllUsers();
+      break;
+    default:
+      ctx.response.redirect('/');
+      break;
+  }
+  sendResponse(ctx, status);
 };
 
 // ------------
@@ -42,10 +44,13 @@ module.exports.get = async (ctx, next) => {
 // ------------
 module.exports.post = async (ctx, next) => {
   const { url } = ctx.request;
+  const {
+    headers: { authorization: jwtData } // JWT-инфо
+  } = ctx.req;
   const body = ctx.request.body;
-  let userData = null;
-  let newsData = null;
-  let checkedUser = null;
+  //   let userData = null;
+  //   let newsData = null;
+  //   let checkedUser = null;
   let status = null;
 
   switch (url) {
@@ -60,6 +65,19 @@ module.exports.post = async (ctx, next) => {
       if (status.code < 400) {
         ctx.session.isAuth = true;
         ctx.session.uid = status.payload.id;
+      }
+      break;
+
+    // обновление токена
+    case '/api/refresh-token':
+      if (jwtData) {
+        status = await UserAPI.refreshUserToken(jwtData);
+      } else {
+        status = {
+          code: 500,
+          message: 'Something is go wrong...',
+          payload: null
+        };
       }
       break;
 
@@ -109,7 +127,7 @@ module.exports.post = async (ctx, next) => {
   //     case '/api/refresh-token':
   //       if (req.headers.authorization) {
   //         // JWT-инфо
-  //         const findUser = await UsersAPI.getUserByJWT(req.headers.authorization);
+  //         const findUser = await UsersAPI.getUserByToken(req.headers.authorization);
   //         if (findUser) {
   //           res.status(201).json(UsersAPI.genToken(findUser));
   //         } else {
@@ -122,7 +140,7 @@ module.exports.post = async (ctx, next) => {
   //     case '/api/news':
   //       if (req.headers.authorization) {
   //         // JWT-инфо
-  //         const findedUser = await UsersAPI.getUserByJWT(
+  //         const findedUser = await UsersAPI.getUserByToken(
   //           req.headers.authorization
   //         );
   //         if (findedUser) {

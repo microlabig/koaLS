@@ -1,3 +1,16 @@
+// отправка результатов на клиент в зависимости от статуса выполненной операции
+module.exports.sendResponse = (ctx, status) => {
+  const { code, message, payload } = status;
+  ctx.status = code;
+  if (code >= 400) {
+    ctx.throw(code, message, payload);
+  } else {
+    console.log(`\nOk! ${code}: ${message}\n`);
+    ctx.response.status = code;
+    ctx.body = payload;
+  }
+};
+
 // валидация входных данных
 module.exports.validateData = (obj) => {
   for (const item in obj) {
@@ -11,16 +24,4 @@ module.exports.validateData = (obj) => {
     }
   }
   return true;
-};
-
-module.exports.sendResponse = (ctx, status) => {
-  const { code, message, payload } = status;
-  ctx.status = code;
-  if (code >= 400) {
-    ctx.throw(code, message, payload);
-  } else {
-    console.log(`\nOk! ${code}: ${message}\n`);
-    ctx.response.status = code;
-    ctx.body = payload;
-  }
 };

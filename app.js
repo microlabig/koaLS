@@ -21,15 +21,15 @@ const CONFIG_COOKIE = {
 };
 const PORT = process.env.PORT || 3000;
 
+// статика
+app.use(serve('./public'));
+
 // парсинг post запросов от клиента
 app.use(koaBody());
 
 // session cookie
 app.keys = [secretKey];
 app.use(session(CONFIG_COOKIE, app));
-
-// статика
-app.use(serve('./public'));
 
 // обработчик ошибок
 app.use(async (ctx, next) => {

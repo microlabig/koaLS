@@ -20,20 +20,15 @@ module.exports = (sequelize, DataTypes) => {
           const password = user.password;
           user.password = await bcrypt.hash(password, 10);
         }
-      },
-      instanceMethods: {
-        // проверка пароля
-        validatePassword: async function (password) {
-          console.log(1234566646356);
-
-          return await bcrypt.compare(password, this.password);
-        }
       }
     }
   );
   user.associate = function (models) {
     // associations can be defined here
   };
-
+  // проверка пароля
+  user.prototype.validatePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+  };
   return user;
 };

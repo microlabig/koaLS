@@ -11,9 +11,9 @@ const isAuth = async (ctx, next) => {
 };
 
 // MW для лога url
-router.get(/.*/, async (ctx, next) => {
+router.all(/.*/, async (ctx, next) => {
   // для дебага в консоли
-  console.log(`\n--- ${ctx.request.method} : ${ctx.request.url} ---`.toUpperCase());
+  console.log(`\n--- ${ctx.req.method} : ${ctx.req.url} ---`.toUpperCase());
   await next();
 });
 
