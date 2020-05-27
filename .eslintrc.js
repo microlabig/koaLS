@@ -15,6 +15,7 @@ module.exports = {
   rules: {
     'no-extra-semi': 'error',
     semi: [2, 'always'],
-    'no-prototype-builtins': 'off'
+    'no-prototype-builtins': 'off',
+    'prefer-promise-reject-errors': 'off'
   }
 };

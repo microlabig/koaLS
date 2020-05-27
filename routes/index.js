@@ -1,13 +1,12 @@
-const path = require('path');
 const Router = require('koa-router');
 const router = new Router();
-const ctrlHome = require(path.join(__dirname, '..', 'controllers', 'home'));
+const ctrl = require('../controllers');
 
 // MW
 const isAuth = async (ctx, next) => {
   // если в сессии текущего пользователя есть пометка о том, что он является авторизованным
   // иначе перебросить пользователя на главную страницу сайта
-  return ctx.session.isAuth ? next() : ctx.redirect('/login');
+  return ctx.session.isAuth ? next() : ctx.redirect('/');
 };
 
 // MW для лога url
@@ -17,13 +16,13 @@ router.all(/.*/, async (ctx, next) => {
   await next();
 });
 
-router.get(/.*$/, isAuth, ctrlHome.get);
-router.post(/.*$/, ctrlHome.post);
+router.get(/.*$/, isAuth, ctrl.get);
+router.post(/.*$/, ctrl.post);
 
-router.patch('/api/users/:id/permission', ctrlHome.userPermissionUpdate);
-router.patch('/api/news/:id', ctrlHome.newsUpdate);
-router.patch('/api/profile', ctrlHome.profileUpdate);
+router.patch('/api/users/:id/permission', ctrl.userPermissionUpdate);
+router.patch('/api/news/:id', ctrl.newsUpdate);
+router.patch('/api/profile', ctrl.profileUpdate);
 
-router.delete('/api/*/:id', ctrlHome.delete);
+router.delete('/api/*/:id', ctrl.delete);
 
 module.exports = router;

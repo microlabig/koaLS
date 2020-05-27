@@ -16,9 +16,15 @@ module.exports = (sequelize, DataTypes) => {
     {
       hooks: {
         // закодируем пароль перед сохранением пользователя
-        beforeCreate: async (user) => {
+        beforeSave: async (user) => {
           const password = user.password;
           user.password = await bcrypt.hash(password, 10);
+        },
+        beforeBulkUpdate: async (user) => {
+          const password = user.attributes.password;
+          if (password) {
+            user.attributes.password = await bcrypt.hash(password, 10);
+          }
         }
       }
     }
