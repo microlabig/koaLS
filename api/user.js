@@ -69,7 +69,7 @@ module.exports.registerUser = async (data) => {
       permission: defaultUserPermission
     });
     // если пользователь успешно создан в БД
-    if (!result) {
+    if (result && !result.dataValues) {
       return { code: 500, message: 'Something is go wrong...', payload: null };
     }
     // отправим сообщение клиенту об успехе
@@ -374,8 +374,8 @@ module.exports.deleteUser = async (id) => {
       return { code: 404, message: 'Пользователь не найден', payload: null };
     }
     // удалим пользователя из БД
-    const status = await User.destroy({ where: { id } });
-    if (!status) {
+    const result = await User.destroy({ where: { id } });
+    if (!result) {
       return { code: 500, message: 'Ошибка удаления', payload: null };
     }
     if (findUser.dataValues.image) {

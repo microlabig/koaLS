@@ -13,14 +13,17 @@ module.exports.get = async (ctx, next) => {
     case '/api/profile':
       status = await UserAPI.getUserByToken(ctx);
       break;
+
     // получений новостей
     case '/api/news':
       status = await NewsAPI.getNews();
       break;
+
     // получение списка всех пользователей
     case '/api/users':
       status = await UserAPI.getAllUsers();
       break;
+
     default:
       ctx.response.redirect('/');
       break;
@@ -34,6 +37,7 @@ module.exports.get = async (ctx, next) => {
 module.exports.post = async (ctx, next) => {
   const { url, body } = ctx.request;
   let status = null;
+  let findUser = null;
 
   switch (url) {
     // регистрация нового пользователя
@@ -57,15 +61,15 @@ module.exports.post = async (ctx, next) => {
 
     // сохранение новости
     case '/api/news':
-      const findUser = UserAPI.getUserByToken(ctx); // определим пользователя по JWT
-      if (!findUser) {
+      findUser = await UserAPI.getUserByToken(ctx); // определим пользователя по JWT
+      if (!findUser.payload) {
         status = {
           code: 500,
           message: 'Пользователь не найден',
           payload: null
         };
       } else {
-        status = await NewsAPI.saveNews(findUser, ctx);
+        status = await NewsAPI.saveNews(findUser.payload, ctx);
       }
       break;
 
@@ -111,9 +115,9 @@ module.exports.delete = async (ctx, next) => {
       break;
 
     // удаление новости по id
-    // case '/api/news/':
-    //   status = await NewsAPI.deleteNews(id);
-    //   break;
+    case '/api/news/':
+      status = await NewsAPI.deleteNews(id);
+      break;
 
     default:
       break;
