@@ -171,14 +171,34 @@ class User {
   // ---------------------------------
   // возвращает пользователя по токену
   // ---------------------------------
-  async getUserByToken(ctx) {
-    const {
-      headers: { authorization: jwtData } // JWT-инфо
-    } = ctx.req;
-
-    if (!jwtData) {
-      return { code: 500, message: 'No Data', payload: null };
+  async getUserById(id) {
+    if (!id) {
+      return { code: 500, message: 'No Id', payload: null };
     }
+    try {
+      const findUser = await userModel.findOne({ where: { id } });
+      // пользователь не найден в БД
+      if (!findUser) {
+        return { code: 500, message: USER_NOT_FOUND, payload: null };
+      }
+      // удалим поле password для передачи данных пользователю
+      if (findUser.dataValues.hasOwnProperty('password')) {
+        delete findUser.dataValues.password;
+      }
+      return {
+        code: 202,
+        message: 'Пользователь найден',
+        payload: findUser.dataValues
+      };
+    } catch (error) {
+      return { code: 500, message: error.message, payload: null };
+    }
+  }
+
+  // ---------------------------------
+  // возвращает пользователя по токену
+  // ---------------------------------
+  async getUserByToken(jwtData) {
     try {
       const { username } = jwt.decode(jwtData, process.env.JWT_SECRET, true);
       const findUser = await userModel.findOne({ where: { username } });
@@ -186,6 +206,7 @@ class User {
       if (!findUser) {
         return { code: 500, message: USER_NOT_FOUND, payload: null };
       }
+      // удалим поле password для передачи данных пользователю
       if (findUser.dataValues.hasOwnProperty('password')) {
         delete findUser.dataValues.password;
       }
@@ -205,16 +226,9 @@ class User {
   // -------------------------------
   // обновление токенов пользователя
   // -------------------------------
-  async refreshToken(ctx) {
-    const {
-      headers: { authorization: jwtData } // JWT-инфо
-    } = ctx.req;
-
-    if (!jwtData) {
-      return { code: 500, message: 'No Data', payload: null };
-    }
+  async refreshToken(jwtData) {
     // найдем пользователя в БД
-    const findUser = await this.getUserByToken(ctx);
+    const findUser = await this.getUserByToken(jwtData);
     // если пользователя нет в БД
     if (findUser && !findUser.payload) {
       return { code: 404, message: 'Пользователь не найден', payload: null };
@@ -230,16 +244,9 @@ class User {
   // ------------------------------------
   // обновление информации о пользователе
   // ------------------------------------
-  async update(ctx) {
-    const {
-      headers: { authorization: jwtData } // JWT-инфо
-    } = ctx.req;
-
-    if (!jwtData) {
-      return { code: 404, message: 'No Data', payload: null };
-    }
+  async update(jwtData) {
     // найдем пользователя, которого необходимо изменить
-    const findUser = await this.getUserByToken(ctx);
+    const findUser = await this.getUserByToken(jwtData);
 
     if (findUser && !findUser.payload) {
       return {

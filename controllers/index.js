@@ -1,4 +1,4 @@
-const { sendResponse } = require('../helpers');
+const { sendResponse, authenticate } = require('../helpers');
 const { UserAPI, NewsAPI } = require('../api');
 
 // ------------
@@ -47,6 +47,7 @@ module.exports.post = async (ctx, next) => {
 
     // логин пользователя
     case '/api/login':
+      await authenticate(ctx, next);
       status = await UserAPI.login(body);
       if (status.code < 400) {
         ctx.session.isAuth = true;
@@ -90,13 +91,29 @@ module.exports.userPermissionUpdate = async (ctx, next) => {
 
 // изменение новости
 module.exports.newsUpdate = async (ctx, next) => {
-  const status = await NewsAPI.update(ctx);
+  const {
+    headers: { authorization: jwtData } // JWT-инфо
+  } = ctx.req;
+  let status = null;
+
+  if (!jwtData) {
+    status = { code: 404, message: 'No Data', payload: null };
+  }
+  status = await NewsAPI.update(ctx);
   sendResponse(ctx, status);
 };
 
 // изменение профиля текущего пользователя
 module.exports.profileUpdate = async (ctx, next) => {
-  const status = await UserAPI.update(ctx);
+  const {
+    headers: { authorization: jwtData } // JWT-инфо
+  } = ctx.req;
+  let status = null;
+
+  if (!jwtData) {
+    status = { code: 404, message: 'No Data', payload: null };
+  }
+  status = await UserAPI.update(ctx);
   sendResponse(ctx, status);
 };
 

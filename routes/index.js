@@ -6,7 +6,9 @@ const ctrl = require('../controllers');
 const isAuth = async (ctx, next) => {
   // если в сессии текущего пользователя есть пометка о том, что он является авторизованным
   // иначе перебросить пользователя на главную страницу сайта
-  return ctx.session.isAuth ? next() : ctx.redirect('/');
+  console.log('(((',ctx.isAuthenticated());
+  
+  return ctx.isAuthenticated() ? next() : ctx.redirect('/');
 };
 
 // MW для лога url

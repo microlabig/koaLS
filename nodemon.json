@@ -2,7 +2,10 @@
     "verbose": true,
     "ignore": [
         "*.json",
-        "./public/"
+        "./public/",
+        "sessions/",
+        "*.lock",
+        "*.lock.json"
     ],
     "execMap": {}
 }
