@@ -11,7 +11,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018
   },
-  extends: 'standard',
+  extends: ['standard', 'prettier'],
   rules: {
     'no-extra-semi': 'error',
     semi: [2, 'always'],

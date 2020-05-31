@@ -16,12 +16,12 @@ module.exports.get = async (ctx, next) => {
 
     // получений новостей
     case '/api/news':
-      status = await NewsAPI.getNews();
+      status = await NewsAPI.getAll();
       break;
 
     // получение списка всех пользователей
     case '/api/users':
-      status = await UserAPI.getAllUsers();
+      status = await UserAPI.getAll();
       break;
 
     default:
@@ -42,12 +42,12 @@ module.exports.post = async (ctx, next) => {
   switch (url) {
     // регистрация нового пользователя
     case '/api/registration':
-      status = await UserAPI.registerUser(body);
+      status = await UserAPI.register(body);
       break;
 
     // логин пользователя
     case '/api/login':
-      status = await UserAPI.loginUser(body);
+      status = await UserAPI.login(body);
       if (status.code < 400) {
         ctx.session.isAuth = true;
         ctx.session.uid = status.payload.id;
@@ -69,7 +69,7 @@ module.exports.post = async (ctx, next) => {
           payload: null
         };
       } else {
-        status = await NewsAPI.saveNews(findUser.payload, ctx);
+        status = await NewsAPI.save(findUser.payload, ctx);
       }
       break;
 
@@ -84,19 +84,19 @@ module.exports.post = async (ctx, next) => {
 // ------------
 // изменение прав пользователя по id (permission)
 module.exports.userPermissionUpdate = async (ctx, next) => {
-  const status = await UserAPI.updateUserPermission(ctx);
+  const status = await UserAPI.updatePermission(ctx);
   sendResponse(ctx, status);
 };
 
 // изменение новости
 module.exports.newsUpdate = async (ctx, next) => {
-  const status = await NewsAPI.updateNews(ctx);
+  const status = await NewsAPI.update(ctx);
   sendResponse(ctx, status);
 };
 
 // изменение профиля текущего пользователя
 module.exports.profileUpdate = async (ctx, next) => {
-  const status = await UserAPI.updateUserInfo(ctx);
+  const status = await UserAPI.update(ctx);
   sendResponse(ctx, status);
 };
 
@@ -111,12 +111,12 @@ module.exports.delete = async (ctx, next) => {
   switch (path) {
     // удаление пользователя по id
     case '/api/users/':
-      status = await UserAPI.deleteUser(id);
+      status = await UserAPI.delete(id);
       break;
 
     // удаление новости по id
     case '/api/news/':
-      status = await NewsAPI.deleteNews(id);
+      status = await NewsAPI.delete(id);
       break;
 
     default:

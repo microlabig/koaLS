@@ -1,16 +1,15 @@
 require('dotenv').config();
 
-const path = require('path');
 const Koa = require('koa');
 const app = new Koa();
 const serve = require('koa-static');
 const koaBody = require('koa-body');
 const cors = require('@koa/cors');
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
 const session = require('koa-session');
-const socketRun = require(path.join(__dirname, 'chat'));
-const db = require(path.join(__dirname, 'db'));
+const server = require('http').createServer(app.callback());
+const io = require('socket.io')(server);
+const socketRun = require('./chat');
+const db = require('./db');
 
 const secretKey = process.env.secretKey || 'secret key session';
 const CONFIG_COOKIE = {
@@ -57,7 +56,7 @@ db.authenticate()
   .catch(console.error);
 
 // основной сервер
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
 
