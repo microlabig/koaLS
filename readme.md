@@ -22,11 +22,11 @@
     JWT_SECRET='jwt_secret' # секретный ключ для работы с JWT-токенами
 
     DB_HOST='127.0.0.1'     # сервер локальной БД
-    DB_PORT='27017'         # порт локальной БД
-
-    REMOTE_DB_NAME='nameDB' # имя удаленной БД
-    REMOTE_DB_USER='user'   # логин доступа к удаленной БД
-    REMOTE_DB_PASS='pass'   # пароль к удаленной БД
+    DB_PORT='5432'          # порт локальной БД
+    DB_USER=user            # имя пользователя
+    DB_PASS=pass            # пароль к БД
+    DB_NAME=name            # имя БД
+    DB_URL=postgres://DB_USER:DB_PASS@DB_HOST:DB_PORT/DB_USER   # полный путь к БД
    ```
 5. запуск проекта командой `node app`
 
