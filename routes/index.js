@@ -1,15 +1,15 @@
 const Router = require('koa-router');
 const router = new Router();
 const ctrl = require('../controllers');
+const { checkUser } = require('../auth');
 
-// MW
-const isAuth = async (ctx, next) => {
-  // если в сессии текущего пользователя есть пометка о том, что он является авторизованным
-  // иначе перебросить пользователя на главную страницу сайта
-  console.log('(((',ctx.isAuthenticated());
-  
-  return ctx.isAuthenticated() ? next() : ctx.redirect('/');
-};
+// // MW
+// const isAuth = async (ctx, next) => {
+//   // если в сессии текущего пользователя есть пометка о том, что он является авторизованным
+//   // иначе перебросить пользователя на главную страницу сайта
+//   console.log('---+---', ctx.isAuthenticated());
+//   return ctx.isAuthenticated() ? await next() : ctx.redirect('/');
+// };
 
 // MW для лога url
 router.all(/.*/, async (ctx, next) => {
@@ -18,8 +18,8 @@ router.all(/.*/, async (ctx, next) => {
   await next();
 });
 
-router.get(/.*$/, isAuth, ctrl.get);
-router.post(/.*$/, ctrl.post);
+router.get(/.*$/, checkUser, ctrl.get);
+router.post(/.*$/, checkUser, ctrl.post);
 
 router.patch('/api/users/:id/permission', ctrl.userPermissionUpdate);
 router.patch('/api/news/:id', ctrl.newsUpdate);

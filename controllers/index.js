@@ -1,4 +1,4 @@
-const { sendResponse, authenticate } = require('../helpers');
+const { sendResponse } = require('../helpers');
 const { UserAPI, NewsAPI } = require('../api');
 
 // ------------
@@ -47,12 +47,9 @@ module.exports.post = async (ctx, next) => {
 
     // логин пользователя
     case '/api/login':
-      await authenticate(ctx, next);
-      status = await UserAPI.login(body);
-      if (status.code < 400) {
-        ctx.session.isAuth = true;
-        ctx.session.uid = status.payload.id;
-      }
+      if (ctx.isAuthenticated()) {
+        status = { code: 200, message: 'Success', payload: ctx.session.user };
+      } 
       break;
 
     // обновление токена
@@ -72,9 +69,6 @@ module.exports.post = async (ctx, next) => {
       } else {
         status = await NewsAPI.save(findUser.payload, ctx);
       }
-      break;
-
-    default:
       break;
   }
   sendResponse(ctx, status);
@@ -105,15 +99,7 @@ module.exports.newsUpdate = async (ctx, next) => {
 
 // изменение профиля текущего пользователя
 module.exports.profileUpdate = async (ctx, next) => {
-  const {
-    headers: { authorization: jwtData } // JWT-инфо
-  } = ctx.req;
-  let status = null;
-
-  if (!jwtData) {
-    status = { code: 404, message: 'No Data', payload: null };
-  }
-  status = await UserAPI.update(ctx);
+  const status = await UserAPI.update(ctx);
   sendResponse(ctx, status);
 };
 
@@ -134,9 +120,6 @@ module.exports.delete = async (ctx, next) => {
     // удаление новости по id
     case '/api/news/':
       status = await NewsAPI.delete(id);
-      break;
-
-    default:
       break;
   }
   sendResponse(ctx, status);

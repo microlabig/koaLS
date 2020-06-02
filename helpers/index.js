@@ -32,26 +32,3 @@ module.exports.validateData = (obj) => {
   }
   return true;
 };
-
-const passport = require('koa-passport');
-// аутентификация
-module.exports.authenticate = async (ctx, next) => {
-  await passport.authenticate('jwt', { session: false }, async (err, user, info) => {
-    if (err) {
-      ctx.throw({ code: 500, message: err.message, payload: null });
-    }
-    if (!user) {
-      ctx.throw({
-        code: 403,
-        message: 'Укажите правильный email или пароль',
-        payload: null
-      });
-      ctx.redirect('/');
-    }
-    await ctx.login(user, async (err) => {
-      (await err)
-        ? ctx.throw({ code: 403, message: err.message, payload: null })
-        : ctx.redirect('/');
-    });
-  })(ctx, next);
-};

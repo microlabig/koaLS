@@ -244,7 +244,15 @@ class User {
   // ------------------------------------
   // обновление информации о пользователе
   // ------------------------------------
-  async update(jwtData) {
+  async update(ctx) {
+    const {
+      headers: { authorization: jwtData } // JWT-инфо
+    } = ctx.req;
+  
+    if (!jwtData) {
+      return { code: 404, message: 'No Data', payload: null };
+    }
+
     // найдем пользователя, которого необходимо изменить
     const findUser = await this.getUserByToken(jwtData);
 

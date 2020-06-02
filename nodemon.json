@@ -3,6 +3,8 @@
     "ignore": [
         "*.json",
         "./public/",
+        "/.vscode",
+        "/node_modules",
         "sessions/",
         "*.lock",
         "*.lock.json"
