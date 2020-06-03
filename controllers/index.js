@@ -11,7 +11,9 @@ module.exports.get = async (ctx, next) => {
   switch (url) {
     // получение профиля по JWT в authorization headers запроса
     case '/api/profile':
-      status = await UserAPI.getUserByToken(ctx);
+      if (ctx.isAuthenticated()) {
+        status = { code: 200, message: 'Success', payload: ctx.session.user };
+      }
       break;
 
     // получений новостей

@@ -1,10 +1,10 @@
 const passport = require('koa-passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JWTStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt; // авторизация через JWT
 
 const { UserAPI } = require('../api');
 
+// настройка passport
 module.exports.passwordSessionSetup = (app) => {
   passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -32,18 +32,25 @@ module.exports.passwordSessionSetup = (app) => {
     )
   );
 
+  // экстрактор jwt из headers.authorization
+  const jwtExtractor = function (req) {
+    const {
+      headers: { authorization: jwtData } // JWT-инфо
+    } = req;
+    return jwtData;
+  };
+
   // JWT-стратегия
   const jwtOptions = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme(''), // '' - В headers.authorization = `${jwt}`, т.е. если необходимо напр. `BEARER ${jwt}`, то fromAuthHeaderWithScheme('BEARER ')
+    jwtFromRequest: jwtExtractor,
     secretOrKey: process.env.JWT_SECRET || 'secret'
   };
+
   passport.use(
     new JWTStrategy(jwtOptions, async (jwtPayload, done) => {
-        console.log('jwtPayload', jwtPayload);
-        
-      const result = await UserAPI.getUserByToken(jwtPayload);
+      const result = await UserAPI.getUserByUsername(jwtPayload.username);
       if (result.code >= 400) {
-        return done(result);
+        return done(result, null);
       }
       return done(null, result.payload);
     })
@@ -80,21 +87,19 @@ const authenticateLocal = async (ctx, next) => {
 const authenticateJWT = async (ctx, next) => {
   await passport.authenticate(
     'jwt',
-    // { session: false },
+    { session: false },
     async (err, user, info) => {
-        console.log('JWT', info);
       if (err) {
         ctx.throw({ code: 500, message: err.message, payload: null });
       }
       if (!user) {
-        // ctx.throw({
-        //   code: 403,
-        //   message: 'Укажите правильный email или пароль',
-        //   payload: null
-        // });
+        ctx.throw({
+          code: 404,
+          message: 'Не найден пользователь',
+          payload: null
+        });
         ctx.redirect('/');
       }
-      
 
       try {
         await ctx.login(user); // логинимся
@@ -106,18 +111,18 @@ const authenticateJWT = async (ctx, next) => {
   )(ctx, next);
 };
 
-// проверка пользователя (логин пользователя)
+// получение данных и проверка пользователя
 module.exports.checkUser = async (ctx, next) => {
   const { url } = ctx.request;
   // если запрос на вход
   switch (url) {
     // получение профиля по JWT в authorization headers запроса
-    case '/api/profile':
+    case '/api/profile': // GET
       await authenticateJWT(ctx, next);
       break;
 
+    // логин пользователя
     case '/api/login': // POST
-      // проверить пользователя
       await authenticateLocal(ctx, next);
       break;
   }

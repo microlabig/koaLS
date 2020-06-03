@@ -27,7 +27,7 @@ const CONFIG_COOKIE = {
   httpOnly: true
 };
 
-// статика
+// подключаем статику
 app.use(serve('./public'));
 
 // парсинг post запросов от клиента
@@ -35,7 +35,6 @@ app.use(koaBody());
 
 // session cookie
 app.keys = [secretKey];
-// app.use(session(CONFIG_COOKIE));
 app.use(session(CONFIG_COOKIE, app));
 
 passwordSessionSetup(app);
@@ -72,7 +71,7 @@ server.listen(PORT, () => {
 // чат на socket.io
 socketRun(io);
 
-// в случае неопредеенной ошибки
+// в случае неопределенной ошибки
 process.on('uncaughtException', (err) => {
   console.error(
     `${new Date().toUTCString()} uncaught exception: ${err.message}`

@@ -199,8 +199,17 @@ class User {
   // возвращает пользователя по токену
   // ---------------------------------
   async getUserByToken(jwtData) {
-    try {
+    console.log('jwtData', jwtData);
+    
       const { username } = jwt.decode(jwtData, process.env.JWT_SECRET, true);
+      await this.getUserByUsername(username);
+  }
+
+  // -----------------------------------
+  // возвращает пользователя по username
+  // -----------------------------------
+  async getUserByUsername(username) {
+    try {
       const findUser = await userModel.findOne({ where: { username } });
       // пользователь не найден в БД
       if (!findUser) {

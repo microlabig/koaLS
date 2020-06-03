@@ -3,14 +3,6 @@ const router = new Router();
 const ctrl = require('../controllers');
 const { checkUser } = require('../auth');
 
-// // MW
-// const isAuth = async (ctx, next) => {
-//   // если в сессии текущего пользователя есть пометка о том, что он является авторизованным
-//   // иначе перебросить пользователя на главную страницу сайта
-//   console.log('---+---', ctx.isAuthenticated());
-//   return ctx.isAuthenticated() ? await next() : ctx.redirect('/');
-// };
-
 // MW для лога url
 router.all(/.*/, async (ctx, next) => {
   // для дебага в консоли
@@ -19,6 +11,7 @@ router.all(/.*/, async (ctx, next) => {
 });
 
 router.get(/.*$/, checkUser, ctrl.get);
+
 router.post(/.*$/, checkUser, ctrl.post);
 
 router.patch('/api/users/:id/permission', ctrl.userPermissionUpdate);
