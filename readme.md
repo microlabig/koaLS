@@ -1,4 +1,4 @@
-# ДЗ 5 (KOA.js + PostgreSQL + socket.io + Docker)
+# ДЗ 5 (KOA.js + PostgreSQL + Passport + socket.io)
 Дата прохождения курса 10.03.2020 - 17.04.2020
 
 Итоговый проект находится на heroku [https://koa-ls.herokuapp.com/](https://koa-ls.herokuapp.com/ "https://koa-ls.herokuapp.com/")
