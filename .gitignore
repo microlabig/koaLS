@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/.vscode
 /.pnp
 .pnp.js
 
@@ -13,6 +14,7 @@
 
 # misc
 .DS_Store
+/sessions
 /*.env
 
 npm-debug.log*

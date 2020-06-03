@@ -11,7 +11,9 @@ module.exports.get = async (ctx, next) => {
   switch (url) {
     // получение профиля по JWT в authorization headers запроса
     case '/api/profile':
-      status = await UserAPI.getUserByToken(ctx);
+      if (ctx.isAuthenticated()) {
+        status = { code: 200, message: 'Success', payload: ctx.session.user };
+      }
       break;
 
     // получений новостей
@@ -47,11 +49,9 @@ module.exports.post = async (ctx, next) => {
 
     // логин пользователя
     case '/api/login':
-      status = await UserAPI.login(body);
-      if (status.code < 400) {
-        ctx.session.isAuth = true;
-        ctx.session.uid = status.payload.id;
-      }
+      if (ctx.isAuthenticated()) {
+        status = { code: 200, message: 'Success', payload: ctx.session.user };
+      } 
       break;
 
     // обновление токена
@@ -72,9 +72,6 @@ module.exports.post = async (ctx, next) => {
         status = await NewsAPI.save(findUser.payload, ctx);
       }
       break;
-
-    default:
-      break;
   }
   sendResponse(ctx, status);
 };
@@ -90,7 +87,15 @@ module.exports.userPermissionUpdate = async (ctx, next) => {
 
 // изменение новости
 module.exports.newsUpdate = async (ctx, next) => {
-  const status = await NewsAPI.update(ctx);
+  const {
+    headers: { authorization: jwtData } // JWT-инфо
+  } = ctx.req;
+  let status = null;
+
+  if (!jwtData) {
+    status = { code: 404, message: 'No Data', payload: null };
+  }
+  status = await NewsAPI.update(ctx);
   sendResponse(ctx, status);
 };
 
@@ -117,9 +122,6 @@ module.exports.delete = async (ctx, next) => {
     // удаление новости по id
     case '/api/news/':
       status = await NewsAPI.delete(id);
-      break;
-
-    default:
       break;
   }
   sendResponse(ctx, status);
