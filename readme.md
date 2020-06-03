@@ -24,7 +24,7 @@
     DB_HOST='127.0.0.1'     # сервер локальной БД
     DB_PORT='5432'          # порт локальной БД
     DB_USER=user            # имя пользователя
-    DB_PASS=pass            # пароль к БД
+    DB_PASS=pass            # пароль к БД 
     DB_NAME=name            # имя БД
     DB_URL=postgres://DB_USER:DB_PASS@DB_HOST:DB_PORT/DB_USER   # полный путь к БД
    ```
