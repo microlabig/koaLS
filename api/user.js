@@ -199,8 +199,6 @@ class User {
   // возвращает пользователя по токену
   // ---------------------------------
   async getUserByToken(jwtData) {
-    console.log('jwtData', jwtData);
-    
       const { username } = jwt.decode(jwtData, process.env.JWT_SECRET, true);
       await this.getUserByUsername(username);
   }

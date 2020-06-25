@@ -25,9 +25,13 @@ module.exports.passwordSessionSetup = (app) => {
       async (username, password, done) => {
         const result = await UserAPI.login({ username, password });
         if (result.code >= 400) {
-          return done(result);
+          process.nextTick(() => { // process.nextTick используется для имитации асинхронной функции
+            return done(result);
+          });
         }
-        return done(null, result.payload);
+        process.nextTick(() => {
+          return done(null, result.payload);
+        });
       }
     )
   );
@@ -50,9 +54,13 @@ module.exports.passwordSessionSetup = (app) => {
     new JWTStrategy(jwtOptions, async (jwtPayload, done) => {
       const result = await UserAPI.getUserByUsername(jwtPayload.username);
       if (result.code >= 400) {
-        return done(result, null);
+        process.nextTick(() => {
+          return done(result, null);
+        });
       }
-      return done(null, result.payload);
+      process.nextTick(() => {
+        return done(null, result.payload);
+      });
     })
   );
 
@@ -62,32 +70,40 @@ module.exports.passwordSessionSetup = (app) => {
 
 // аутентификация
 const authenticateLocal = async (ctx, next) => {
-  await passport.authenticate('local', async (err, user, info) => {
-    if (err) {
-      ctx.throw({ code: 500, message: err.message, payload: null });
+  return await passport.authenticate(
+    'local',
+    { successRedirect: '/profile', failureRedirect: '/' },
+    async (err, user, info) => {
+      if (err) {
+        ctx.throw({ code: 500, message: err.message, payload: null });
+      }
+      if (!user) {
+        ctx.throw({
+          code: 403,
+          message: 'Укажите правильный email или пароль',
+          payload: null
+        });
+        ctx.redirect('/');
+      }
+      try {
+        await ctx.login(user); // логинимся
+        ctx.session.user = user; // для передачи данных пользователю
+      } catch (error) {
+        ctx.throw({ code: 403, message: error.message, payload: null });
+      }
     }
-    if (!user) {
-      ctx.throw({
-        code: 403,
-        message: 'Укажите правильный email или пароль',
-        payload: null
-      });
-      ctx.redirect('/');
-    }
-    try {
-      await ctx.login(user); // логинимся
-      ctx.session.user = user; // для передачи данных пользователю
-    } catch (error) {
-      ctx.throw({ code: 403, message: error.message, payload: null });
-    }
-  })(ctx, next);
+  )(ctx, next);
 };
 
 // аутентификация JWT
 const authenticateJWT = async (ctx, next) => {
-  await passport.authenticate(
+  return await passport.authenticate(
     'jwt',
-    { session: false },
+    {
+      session: false,
+      successRedirect: '/profile',
+      failureRedirect: '/'
+    },
     async (err, user, info) => {
       if (err) {
         ctx.throw({ code: 500, message: err.message, payload: null });
@@ -100,7 +116,6 @@ const authenticateJWT = async (ctx, next) => {
         });
         ctx.redirect('/');
       }
-
       try {
         await ctx.login(user); // логинимся
         ctx.session.user = user; // для передачи данных пользователю
